@@ -5,36 +5,67 @@
     include_once("connection.php");
     include_once("url.php");
 
-    $id;
+    $data = $_POST;
 
-    if (!empty($_GET)) {
-        $id = $_GET["id"];
-    }
+    if (!empty($data)) {
+        
+        if($data["type"] === "create") {
+            $name = $data["name"];
+            $phone = $data["phone"];
+            $observations = $data["observations"];
 
-    if (!empty($id)) {
+            $query = "INSERT INTO contacts (name, phone, observations) VALUES (:name, :phone, :observations)";
 
-        $query = "SELECT * FROM contacts WHERE id = :id";
+            $stmt = $conn->prepare($query);
 
-        $stmt = $conn->prepare($query);
+            $stmt->bindParam(":name", $name);
+            $stmt->bindParam(":phone", $phone);
+            $stmt->bindParam(":observations", $observations);
 
-        $stmt->bindParam(":id", $id);
+            try {
+                $stmt->execute();
+                $_SESSION["msg"] = "Success contact created";
+            } catch (PDOException $e) {
+                $error = $e->getMessage();
+                echo "Error: $error";
+            }
+        }
 
-        $stmt->execute();
-
-        $contact = $stmt->fetch();
+        header("Location:" . $BASE_URL . "../index.php");
 
     } else {
+        $id;
 
-        $contacts = [];
+        if (!empty($_GET)) {
+            $id = $_GET["id"];
+        }
 
-        $query = "SELECT * FROM contacts";
+        if (!empty($id)) {
 
-        $stmt = $conn->prepare($query);
+            $query = "SELECT * FROM contacts WHERE id = :id";
 
-        $stmt->execute();
+            $stmt = $conn->prepare($query);
 
-        $contacts = $stmt->fetchAll();
+            $stmt->bindParam(":id", $id);
+
+            $stmt->execute();
+
+            $contact = $stmt->fetch();
+
+        } else {
+
+            $contacts = [];
+
+            $query = "SELECT * FROM contacts";
+
+            $stmt = $conn->prepare($query);
+
+            $stmt->execute();
+
+            $contacts = $stmt->fetchAll();
+
+        }
 
     }
 
-    
+$conn = null;
