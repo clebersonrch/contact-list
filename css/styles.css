@@ -43,6 +43,10 @@ body {
     color: #007BFF;
 }
 
+.delete-form {
+    display: inline-block;
+}
+
 .delete-icon {
     color: #BD2130;
 }
@@ -105,5 +109,5 @@ body {
     #home-link {
         display: none;
     }
-    
+
 }
